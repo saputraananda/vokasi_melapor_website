@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cetak Data</title>
+    <link rel="stylesheet" type="text/css" href="form/style.css">
+    <style>
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            table#data-table td.print-hide {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(() => {
+            $.ajax({
+                url: 'https://ap-southeast-1.aws.data.mongodb-api.com/app/vokasi-melapor-ftvnz/endpoint/get_laporan_web',
+                type: 'GET',
+                beforeSend: () => {
+                    $('#data-table tbody').html('<tr><td colspan="4">Memuat...</td></tr>');
+                },
+                success: (res) => {
+                    $('#data-table tbody').html('');
+
+                    if (!res.length) {
+                        $('#data-table tbody').html('<tr><td colspan="4">Belum ada data</td></tr>');
+                    }
+
+                    $.each(res, (index, data) => {
+                        $('#data-table tbody').append(
+                            '<tr>' +
+                            '<td align="center">' + data.name + '</td>' +
+                            '<td align="center">' + data.nim + '</td>' +
+                            '<td align="center">' + data.title + '</td>' +
+                            '<td align="center">' + data.message + '</td>' +
+                            '</tr>'
+                        );
+                    });
+                },
+                error: (err) => {
+                    console.log(err);
+                }
+            });
+        });
+
+        function printTable() {
+            var table = document.getElementById("data-table");
+            var html = "<html><head><title>Lihat Data - Cetak Semua</title></head><body>";
+            html += table.outerHTML;
+            html += "</body></html>";
+            var printWindow = window.open("", "_blank");
+            printWindow.document.open();
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.print();
+        }
+    </script>
+</head>
+<body>
+<center>
+    <table id="data-table" class="content-table" cellpadding="7" cellspacing="0" border="1">
+        <thead>
+            <tr bgcolor="#CCCCCC">
+                <th><center>Nama Pelapor</center></th>
+                <th><center>NIM</center></th>
+                <th><center>Judul Laporan</center></th>
+                <th><center>Isi Laporan</center></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Table content will be populated dynamically -->
+        </tbody>
+    </table>
+</center>
+</body>
+</html>

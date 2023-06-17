@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Form Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+    
+    .container {
+      width: 300px;
+      background-color: #fff;
+      margin: 0 auto;
+      padding: 20px;
+      margin-top: 100px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .container h2 {
+      text-align: center;
+      margin-bottom: -15px;
+    }
+    
+    .container input[type="text"],
+    .container input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      border-radius: 4px;
+    }
+    
+    .container input[type="checkbox"] {
+      margin-bottom: 10px;
+    }
+    
+    .container input[type="submit"] {
+      background-color: #ff66c4;
+      color: #fff;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+    
+    .container input[type="submit"]:hover {
+      background-color: #100d8b;
+    }
+  </style>
+  <script>
+    function togglePasswordVisibility() {
+      var passwordInput = document.getElementById("passwordInput");
+      var passwordToggle = document.getElementById("passwordToggle");
+      
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        passwordToggle.innerText = "Sembunyikan Password";
+      } else {
+        passwordInput.type = "password";
+        passwordToggle.innerText = "Tampilkan Password";
+      }
+    }
+    
+    function validateLogin() {
+      var username = document.getElementById("usernameInput").value;
+      var password = document.getElementById("passwordInput").value;
+      
+      if (username === "Admin" && password === "Admin") {
+        alert("Login berhasil!");
+        window.location.href = "beranda.html"; // Mengarahkan pengguna ke halaman beranda.html
+        return false; // Menghentikan event submit
+      } else {
+        alert("Username atau password salah. Silakan coba lagi!");
+        return false; // Menghentikan event submit
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin</h2>
+    <center><h4>Vokasi Melapor</h4></center>
+    <form onsubmit="return validateLogin();">
+      <input type="text" id="usernameInput" placeholder="Username" required>
+      <input type="password" id="passwordInput" placeholder="Password" required>
+      <label for="showPassword">
+        <input type="checkbox" id="showPassword" name="showPassword" onchange="togglePasswordVisibility()">
+        Tampilkan Password
+      </label>
+      <input type="submit" value="Login">
+    </form>
+  </div>
+</body>
+</html>

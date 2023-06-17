@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lihat Data</title>
+    <link rel="stylesheet" type="text/css" href="form/style.css">
+    <link rel="stylesheet" type="text/css" href="form/button.css">
+    <link rel="stylesheet" type="text/css" href="form/nav.css">
+    <style>
+        @media print {
+            .print-hide {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+       $(document).ready(() => {
+    function loadData() {
+        $.ajax({
+            url: 'https://ap-southeast-1.aws.data.mongodb-api.com/app/vokasi-melapor-ftvnz/endpoint/get_laporan_web',
+            type: 'GET',
+            beforeSend: () => {
+                $('#data-table tbody').html('<tr><td colspan="4">Memuat...</td></tr>');
+            },
+            success: (res) => {
+                $('#data-table tbody').html('');
+
+                if (res.length === 0) {
+                    $('#data-table tbody').html('<tr><td colspan="4">Belum ada data</td></tr>');
+                } else {
+                    $.each(res, (index, data) => {
+                        $('#data-table tbody').append(
+                            '<tr>' +
+                            '<td align="center">' + data.name + '</td>' +
+                            '<td align="center">' + data.nim + '</td>' +
+                            '<td align="center">' + data.title + '</td>' +
+                            '<td align="center">' + data.message + '</td>' +
+                            '<td align="center">' +
+                            '<button class="btn btn-danger btn-sm delete" data-id="' + data.nim + '" style="background-color: red;">hapus</button>' +
+                            '<button class="btn btn-sm edit" data-id="' + data.nim + '" style="background-color: green;">update</button>' +
+                            '</td>' +
+                            '</tr>'
+                        );
+                    });
+
+                    $('.edit').click(function() {
+                        var nim = $(this).data('id');
+                        var row = $(this).closest('tr');
+                        var name = row.find('td:nth-child(1)').text();
+                        var title = row.find('td:nth-child(3)').text();
+                        var message = row.find('td:nth-child(4)').text();
+
+                        var newName = prompt('Masukkan Nama Pelapor baru:', name);
+                        var newTitle = prompt('Masukkan Judul Laporan baru:', title);
+                        var newMessage = prompt('Masukkan Isi Laporan baru:', message);
+
+                        if (newName !== null && newTitle !== null && newMessage !== null) {
+                            // Update data laporan
+                            $.ajax({
+                                url: 'https://ap-southeast-1.aws.data.mongodb-api.com/app/vokasi-melapor-ftvnz/endpoint/update_laporan_web?nim=' + nim,
+                                type: 'PUT',
+                                data: {
+                                    name: newName,
+                                    title: newTitle,
+                                    message: newMessage
+                                },
+                                beforeSend: () => {
+                                    $('.btn').prop('disabled', true);
+                                },
+                                success: (res) => {
+                                    alert(res);
+                                    loadData();
+                                },
+                                error: (err) => {
+                                    console.log(err);
+                                }
+                            });
+                        }
+                    });
+                }
+            },
+            error: (err) => {
+                console.log(err);
+            }
+        });
+    }
+
+    loadData();
+
+    $('#data-table').on('click', '.delete', (e) => {
+        if (confirm('Apakah Anda yakin menghapus data?')) {
+            var nim = e.target.dataset.id;
+
+            $.ajax({
+                url: 'https://ap-southeast-1.aws.data.mongodb-api.com/app/vokasi-melapor-ftvnz/endpoint/delete_laporan_web?nim=' + nim,
+                type: 'DELETE',
+                beforeSend: () => {
+                    $('.btn').prop('disabled', true);
+                },
+                success: (res) => {
+                    loadData();
+                },
+                error: (err) => {
+                    console.log(err);
+                }
+            });
+        }
+    });
+
+    function printTable() {
+        var table = document.getElementById("data-table");
+        var html = "<html><head><title>Lihat Data - Cetak Semua</title></head><body>";
+        html += table.outerHTML;
+        html += "</body></html>";
+        var printWindow = window.open("", "_blank");
+        printWindow.document.open();
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.print();
+    }
+});
+
+    </script>
+</head>
+<body>
+<nav>
+    <label class="logo">Admin Vokasi Melapor</label>
+    <ul>
+        <li><a href="beranda.html">Data Laporan</a></li>
+        <li><a href="cetak.html" target="_blank">Print Semua</a></li>
+        <li><a href="login.html">Logout</a></li>
+    </ul>
+</nav>
+<center>
+    <table id="data-table" class="content-table" cellpadding="7" cellspacing="0" border="1">
+        <thead>
+            <tr bgcolor="#CCCCCC">
+                <th><center>Nama Pelapor</center></th>
+                <th><center>NIM</center></th>
+                <th><center>Judul Laporan</center></th>
+                <th><center>Isi Laporan</center></th>
+                <th class="print-hide"><center>Opsi</center></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Table content will be populated dynamically -->
+        </tbody>
+    </table>
+</center>
+</body>
+</html>
